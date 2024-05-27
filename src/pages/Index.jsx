@@ -1,7 +1,54 @@
-import { Box, Button, Container, Flex, Heading, HStack, Image, Link, SimpleGrid, Text, VStack } from "@chakra-ui/react";
-import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
+import { Box, Button, Container, Flex, Heading, HStack, Image, Link, SimpleGrid, Text, VStack, Icon, useToast } from "@chakra-ui/react";
+import { FaFacebook, FaTwitter, FaInstagram, FaStar } from "react-icons/fa";
+import { useState } from "react";
 
 const Index = () => {
+  const [ratings, setRatings] = useState({
+    recipe1: 0,
+    recipe2: 0,
+    recipe3: 0,
+  });
+
+  const toast = useToast();
+
+  const handleRate = (recipe, rating) => {
+    setRatings((prevRatings) => ({
+      ...prevRatings,
+      [recipe]: rating,
+    }));
+    toast({
+      title: "Rating submitted.",
+      description: `You rated ${recipe} with ${rating} stars.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const StarRating = ({ rating, onRate }) => {
+    const [hover, setHover] = useState(null);
+
+    return (
+      <HStack spacing={1}>
+        {[...Array(5)].map((_, index) => {
+          const ratingValue = index + 1;
+          return (
+            <Icon
+              key={index}
+              as={FaStar}
+              boxSize={6}
+              color={ratingValue <= (hover || rating) ? "teal.500" : "gray.300"}
+              cursor="pointer"
+              onClick={() => onRate(ratingValue)}
+              onMouseEnter={() => setHover(ratingValue)}
+              onMouseLeave={() => setHover(null)}
+            />
+          );
+        })}
+      </HStack>
+    );
+  };
+
   return (
     <Container maxW="container.xl" p={0}>
       {/* Navigation Bar */}
@@ -31,6 +78,8 @@ const Index = () => {
             <Box p={6}>
               <Heading as="h4" size="md" mb={2}>Recipe Title 1</Heading>
               <Text>Short description of the recipe.</Text>
+              <StarRating rating={ratings.recipe1} onRate={(rating) => handleRate("recipe1", rating)} />
+              <Text mt={2}>Average Rating: {ratings.recipe1}</Text>
             </Box>
           </Box>
           <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
@@ -38,6 +87,8 @@ const Index = () => {
             <Box p={6}>
               <Heading as="h4" size="md" mb={2}>Recipe Title 2</Heading>
               <Text>Short description of the recipe.</Text>
+              <StarRating rating={ratings.recipe2} onRate={(rating) => handleRate("recipe2", rating)} />
+              <Text mt={2}>Average Rating: {ratings.recipe2}</Text>
             </Box>
           </Box>
           <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
@@ -45,6 +96,8 @@ const Index = () => {
             <Box p={6}>
               <Heading as="h4" size="md" mb={2}>Recipe Title 3</Heading>
               <Text>Short description of the recipe.</Text>
+              <StarRating rating={ratings.recipe3} onRate={(rating) => handleRate("recipe3", rating)} />
+              <Text mt={2}>Average Rating: {ratings.recipe3}</Text>
             </Box>
           </Box>
         </SimpleGrid>
